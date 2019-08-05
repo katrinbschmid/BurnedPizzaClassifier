@@ -1,2 +1,3 @@
 # BurnedPizzaClassifier
-exploring keras
+Super simple binary classifier exploring keras and answering the question: Is the pizza burned?
+Should use more training data...
