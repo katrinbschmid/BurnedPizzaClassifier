@@ -1,4 +1,6 @@
 
+import os
+
 from keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D
 from keras.layers import Dense, Activation, Dropout, Flatten
 from keras import optimizers
@@ -76,7 +78,6 @@ def test(image_path, img_width=150, img_height = 150):
 	model.compile(loss='binary_crossentropy',
 	              optimizer='rmsprop',
 	              metrics=['accuracy'])
-	
 	classes = model.predict_classes(images, batch_size=10)
 	if classes[0][0] == 1:
 		prediction = 'normal'
@@ -85,19 +86,18 @@ def test(image_path, img_width=150, img_height = 150):
 	return prediction
 
 def main():
-	train(epochs=20)
-	img0 = r'../data/test/5cd5c7261f000030009e6a98.jpeg'
-	img1 = r'../data/test/o.jpg'
-	img2 = r'../data/test/01-most-instagram-worthy-restaurants.jpg'
-	img3 = r'../data/test/pizza_amelia_hitchens.jpg'
-	prediction0 = test(img0)
-	print (img0, prediction0)
-	prediction1 = test(img1)
-	print (img1, prediction1)
-	prediction2 = test(img2)
-	print (img2, prediction2)
-	prediction3 = test(img3)
-	print (img3, prediction3)
+	#train(epochs=12)
+
+	for img2 in os.listdir('../data/pizza/test/burned'):
+		prediction2 = test(os.path.join('../data/pizza/test/burned', img2))
+		print (img2, prediction2,prediction2 =='burned')
+		#assert(prediction2 =='burned')
+	print ()
+	for img3 in os.listdir('../data/pizza/test/normal'):
+		prediction3 = test(os.path.join('../data/pizza/test/normal', img3))
+		print (img3, prediction3, prediction3 is not 'burned')
+		#assert(prediction3 is not 'burned')
+
 	return
 
 main()
