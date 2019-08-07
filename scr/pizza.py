@@ -35,8 +35,8 @@ def train(epochs=20, img_width=150, img_height=150,
 	print('Starting')
 	datagen = ImageDataGenerator(rescale = 1./255,
 	 shear_range=0.2,
-	zoom_range=0.2,
-	horizontal_flip=True
+	#zoom_range=0.2,
+	#horizontal_flip=True
 	)
 	#test_datagen = ImageDataGenerator(rescale=1./255)
 	train_generator = datagen.flow_from_directory(directory=train_data_dir,
