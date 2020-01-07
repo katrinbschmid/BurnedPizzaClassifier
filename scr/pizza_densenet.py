@@ -20,9 +20,10 @@ data_dir = r"D:\workspace\git_scr\BurnedPizzaClassifier\data\pizza"#'Cat_Dog_dat
 fp = r'C:\Users\kabis\.pytorch\pizza_pyt_70.pth'
 
 # TODO: Define transforms for the training data and testing data
+#https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
-        torchvision.transforms.RandomRotation(30),
-        torchvision.transforms.RandomResizedCrop(224),
+        torchvision.transforms.RandomRotation(20),
+        torchvision.transforms.RandomResizedCrop(224, scale=(0.85, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize([0.485, 0.456, 0.406],
@@ -107,8 +108,9 @@ def getModel():
 
 
 def train(model, trainloader, device, optimizer, criterion,
-          epochs=1, steps=0, print_every=5):
+          epochs=1, print_every=5):
     running_loss = 0
+    steps = 0
     for epoch in range(epochs):
         for inputs, labels in trainloader:
             steps += 1
@@ -207,6 +209,58 @@ def visualize_model(model, dataloader, device, num_images=6,images_so_far = 0):
 #plt.ioff()
 #plt.show()
 
+#TODO plot loss https://github.com/pytorch/examples/blob/master/imagenet/main.py#L327
+
+def validate(val_loader, model, criterion, args):
+    batch_time = AverageMeter('Time', ':6.3f')
+    losses = AverageMeter('Loss', ':.4e')
+    top1 = AverageMeter('Acc@1', ':6.2f')
+    top5 = AverageMeter('Acc@5', ':6.2f')
+    progress = ProgressMeter(
+        len(val_loader),
+        [batch_time, losses, top1, top5],
+        prefix='Test: ')
+
+    # switch to evaluate mode
+    model.eval()
+
+    with torch.no_grad():
+        end = time.time()
+        for i, (images, target) in enumerate(val_loader):
+            if args.gpu is not None:
+                images = images.cuda(args.gpu, non_blocking=True)
+            target = target.cuda(args.gpu, non_blocking=True)
+
+            # compute output
+            output = model(images)
+            loss = criterion(output, target)
+
+            # measure accuracy and record loss
+            acc1, acc5 = accuracy(output, target, topk=(1, 5))
+            losses.update(loss.item(), images.size(0))
+            top1.update(acc1[0], images.size(0))
+            top5.update(acc5[0], images.size(0))
+
+            # measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            if i % args.print_freq == 0:
+                progress.display(i)
+
+        # TODO: this should also be done with the ProgressMeter
+        print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
+              .format(top1=top1, top5=top5))
+
+    return top1.avg
+
+
+def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+    torch.save(state, filename)
+    if is_best:
+        shutil.copyfile(filename, 'model_best.pth.tar')
+
+
 def main():
     model, device, optimizer, criterion = getModel()
     inputs, classes = next(iter(trainloader))# Make a grid from batch
@@ -218,7 +272,7 @@ def main():
         model.load_state_dict(state_dict)
     else:
         train(model, trainloader, device, optimizer, criterion,
-               epochs=70, steps=2, print_every=5)
+               epochs=70, print_every=8)
         torch.save(model.state_dict(), fp)
     test(None, model, device, valloader)
     return 0
