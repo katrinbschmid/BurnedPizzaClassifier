@@ -17,7 +17,7 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"D:\workspace\git_scr\BurnedPizzaClassifier\data\pizza"#'Cat_Dog_data'
-fp = r'C:\Users\kabis\.pytorch\pizza_pyt.pth'
+fp = r'C:\Users\kabis\.pytorch\pizza_pyt_e70.pth'
 
 # TODO: Define transforms for the training data and testing data
 train_transforms = torchvision.transforms.Compose([
@@ -139,7 +139,7 @@ def train(model, trainloader, device, optimizer, criterion,
                         equals = top_class == labels.view(*top_class.shape)
                         accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
                         
-                print(f"pEpoch {epoch+1}/{epochs}.. " + str(steps)+
+                print(f"Epoch {epoch+1}/{epochs}.. " + str(steps)+
                       f"Train loss: {running_loss/print_every:.3f}.. "
                       f"Test loss: {test_loss/len(testloader):.3f}.. "
                       f"Test accuracy: {accuracy/len(testloader):.3f}")
@@ -170,7 +170,7 @@ def test(args, model, device, test_loader):
             test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
-            print( data, target, target.view_as(pred))
+            #print( data, target, target.view_as(pred))
 
     test_loss /= len(test_loader.dataset)
 
@@ -236,7 +236,7 @@ def main():
         model.load_state_dict(state_dict)
     else:
         train(model, trainloader, device, optimizer, criterion,
-               epochs=10, steps=0, print_every=5)
+               epochs=70, steps=2, print_every=5)
         torch.save(model.state_dict(), fp)
     test(None, model, device, valloader)
     return 0
