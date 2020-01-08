@@ -269,7 +269,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
 
 def main():
-    model, device, optimizer, criterion = getModel(lr=0.007)
+    model, device, optimizer, criterion = getModel(lr=0.004)
     inputs, classes = next(iter(trainloader))# Make a grid from batch
     sample_train_images = torchvision.utils.make_grid(inputs)
     #helper.imshow(sample_train_images, title=classes)
