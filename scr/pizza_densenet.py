@@ -3,6 +3,9 @@
 #https://forums.fast.ai/t/using-pytorch-for-kaggle-dogs-vs-cats-competition-tutorial/30233
 based on classifies as burned as n
 https://discuss.pytorch.org/t/easiest-way-to-draw-training-validation-loss/13195/9
+
+https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neural-networks-3ca24c31ddc8
+
 """
 import time
 import os
@@ -47,7 +50,7 @@ testloader = torch.utils.data.DataLoader(test_data, batch_size=batchs)
 valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=False)
 class_names = train_data.classes
 
-def getModel():
+def getModel(lr=0.003):
     model = torchvision.models.densenet121(pretrained=True)
     #We can load in a model such as DenseNet. Let's print out the model architecture so we can see what's going on.
     # Freeze parameters so we don't backprop through them
@@ -102,7 +105,13 @@ def getModel():
                                      nn.LogSoftmax(dim=1))
     criterion = nn.NLLLoss()
     # Only train the classifier parameters, feature parameters are frozen
-    optimizer = optim.Adam(model.classifier.parameters(), lr=0.003)
+    optimizer = optim.Adam(model.classifier.parameters(), lr=lr)
+    """
+        optimizer = optim.Adam([
+                {'params': net.layer.weight},
+                {'params': net.layer.bias, 'lr': 0.01}
+            ], lr=0.1, weight_decay=0.0001)
+    """
     model.to(device)
     return model, device, optimizer, criterion
 
@@ -260,7 +269,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
 
 def main():
-    model, device, optimizer, criterion = getModel()
+    model, device, optimizer, criterion = getModel(lr=0.007)
     inputs, classes = next(iter(trainloader))# Make a grid from batch
     sample_train_images = torchvision.utils.make_grid(inputs)
     #helper.imshow(sample_train_images, title=classes)
