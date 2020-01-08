@@ -17,13 +17,13 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"D:\workspace\git_scr\BurnedPizzaClassifier\data\pizza"#'Cat_Dog_data'
-fp = r'C:\Users\kabis\.pytorch\pizza_pyt_70.pth'
+fp = r'C:\Users\kabis\.pytorch\pizza_pyt_50.pth'
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
         torchvision.transforms.RandomRotation(20),
-        torchvision.transforms.RandomResizedCrop(224, scale=(0.85, 1.0)),
+        torchvision.transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize([0.485, 0.456, 0.406],
@@ -41,7 +41,7 @@ train_data = torchvision.datasets.ImageFolder(data_dir + '/train', transform=tra
 test_data = torchvision.datasets.ImageFolder(data_dir + '/test', transform=test_transforms)
 val_data = torchvision.datasets.ImageFolder(data_dir + '/validation', transform=train_transforms)
 
-batchs = 32
+batchs = 64
 trainloader = torch.utils.data.DataLoader(train_data, batch_size=batchs, shuffle=True)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=batchs)
 valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=False)
@@ -205,9 +205,7 @@ def visualize_model(model, dataloader, device, num_images=6,images_so_far = 0):
                     model.train(mode=was_training)
                     return
         model.train(mode=was_training)
-#visualize_model(model_conv)
-#plt.ioff()
-#plt.show()
+    return 
 
 #TODO plot loss https://github.com/pytorch/examples/blob/master/imagenet/main.py#L327
 
@@ -272,12 +270,13 @@ def main():
         model.load_state_dict(state_dict)
     else:
         train(model, trainloader, device, optimizer, criterion,
-               epochs=70, print_every=8)
+               epochs=50, print_every=8)
         torch.save(model.state_dict(), fp)
     test(None, model, device, valloader)
-    return 0
-    misclassified, images_so_far = visualize_model(model, valloader, device, num_images=6)
-    print (images_so_far, " f: ", len(misclassified), misclassified)
+    validate(valloader, model, criterion, None)
+    visualize_model(model, valloader, device)
+    plt.ioff()
+    plt.show()
     return 0
 
 print(class_names)
