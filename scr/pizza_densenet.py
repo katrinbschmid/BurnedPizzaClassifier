@@ -203,12 +203,14 @@ def visualize_model(model, dataloader, device, num_images=6,images_so_far = 0):
             inputs = inputs.to(device)
             labels = labels.to(device)    
             outputs = model(inputs)
-            _, preds = torch.max(outputs, 1)            
+            _, preds = torch.max(outputs, 1)
             for j in range(inputs.size()[0]):
                 images_so_far += 1
                 ax = plt.subplot(num_images//2, 2, images_so_far)
                 ax.axis('off')
-                ax.set_title('predicted: {}'.format(class_names[preds[j]]))
+                fn = os.path.basename(dataloader.dataset.samples[j][0])
+                print(fn, dataloader.dataset.samples[j][1] )
+                ax.set_title('predicted: {} ({})'.format(class_names[preds[j]],fn))
                 imshow(inputs.cpu().data[j])                
                 if images_so_far == num_images:
                     model.train(mode=was_training)
