@@ -47,7 +47,7 @@ val_data = torchvision.datasets.ImageFolder(data_dir + '/validation', transform=
 batchs = 64
 trainloader = torch.utils.data.DataLoader(train_data, batch_size=batchs, shuffle=True)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=batchs)
-valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=False)
+valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=True)
 class_names = train_data.classes
 
 def getModel(lr=0.003):
