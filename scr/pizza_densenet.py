@@ -20,7 +20,7 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"D:\workspace\git_scr\BurnedPizzaClassifier\data\pizza"#'Cat_Dog_data'
-fp = r'C:\Users\kabis\.pytorch\pizza_pyt_50.pth'
+fp = r'C:\Users\kabis\.pytorch\pizza_fpyt_100.pth'
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
@@ -47,7 +47,7 @@ val_data = torchvision.datasets.ImageFolder(data_dir + '/validation', transform=
 batchs = 64
 trainloader = torch.utils.data.DataLoader(train_data, batch_size=batchs, shuffle=True)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=batchs)
-valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=True)
+valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=False)
 class_names = train_data.classes
 
 def getModel(lr=0.003):
@@ -201,7 +201,7 @@ def visualize_model(model, dataloader, device, num_images=6,images_so_far = 0):
     with torch.no_grad():
         for i, (inputs, labels) in enumerate(dataloader):
             inputs = inputs.to(device)
-            labels = labels.to(device)    
+            labels = labels.to(device)
             outputs = model(inputs)
             _, preds = torch.max(outputs, 1)
             for j in range(inputs.size()[0]):
@@ -215,6 +215,8 @@ def visualize_model(model, dataloader, device, num_images=6,images_so_far = 0):
                 if images_so_far == num_images:
                     model.train(mode=was_training)
                     return
+            plt.ioff()
+            plt.show()
         model.train(mode=was_training)
     return 
 
@@ -243,11 +245,11 @@ class AverageMeter(object):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
 #https://github.com/pytorch/examples/blob/master/imagenet/main.py#L199
-def adjust_learning_rate(optimizer, epoch, args):
+def adjust_learning_rate(lr, epoch):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    lr = args.lr * (0.1 ** (epoch // 30))
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
+    lr = lr * (0.1 ** (epoch // 30))
+    #for param_group in optimizer.param_groups:
+     #   param_group['lr'] = lr
     return lr
         
 class ProgressMeter(object):
@@ -338,7 +340,10 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
 
 def main():
-    model, device, optimizer, criterion = getModel(lr=0.004)
+    epochs = 100
+    lr = 0.0035
+    print("lr:", lr)
+    model, device, optimizer, criterion = getModel(lr=lr)
     inputs, classes = next(iter(trainloader))# Make a grid from batch
     sample_train_images = torchvision.utils.make_grid(inputs)
     #helper.imshow(sample_train_images, title=classes)
@@ -348,7 +353,7 @@ def main():
         model.load_state_dict(state_dict)
     else:
         train(model, trainloader, device, optimizer, criterion,
-               epochs=50, print_every=8)
+               epochs=epochs, print_every=8)
         torch.save(model.state_dict(), fp)
     test(None, model, device, valloader)
     #validate(valloader, model, criterion, device)
