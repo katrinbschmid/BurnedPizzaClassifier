@@ -20,7 +20,7 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"D:\workspace\git_scr\BurnedPizzaClassifier\data\pizza"#'Cat_Dog_data'
-fp = r'C:\Users\kabis\.pytorch\pizza_fpyt_100.pth'
+fp = r'C:\Users\kabis\.pytorch\pizza_yt_100.pth'
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
