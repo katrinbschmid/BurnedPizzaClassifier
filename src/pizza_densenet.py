@@ -125,12 +125,12 @@ def getModel(lr=0.003):
 
 
 def train(model, trainloader, device, optimizer, criterion,
-          epochs=1, print_every=5):
+          epochs=1, print_every=10):
     running_loss = 0
     steps = 0
     for epoch in range(epochs):
         # decrease learning rate
-        lr = adjust_learning_rate(optimizer, epoch, every=8)
+        lr = adjust_learning_rate(optimizer, epoch, every=12)
 
         for inputs, labels in trainloader:
             steps += 1
