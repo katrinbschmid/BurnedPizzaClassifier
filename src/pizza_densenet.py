@@ -130,7 +130,7 @@ def train(model, trainloader, device, optimizer, criterion,
     steps = 0
     for epoch in range(epochs):
         # decrease learning rate
-        lr = adjust_learning_rate(optimizer, epoch)
+        lr = adjust_learning_rate(optimizer, epoch, every=30)
 
         for inputs, labels in trainloader:
             steps += 1
@@ -302,7 +302,7 @@ def adjust_learning_rate(optimizer, epoch, every=30):
     """Sets the learning rate to the initial LR decayed by 10 % every 30 epochs"""
     lr = ilr  - ilr * (0.1 * (epoch // every))
     for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
+        #param_group['lr'] = lr
         print(epoch, " is : ", param_group['lr'], lr, (0.1 * (epoch // every)))
     return lr
         
