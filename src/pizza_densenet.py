@@ -6,6 +6,10 @@ https://discuss.pytorch.org/t/easiest-way-to-draw-training-validation-loss/13195
 https://towardsdatascience.com/batch-normalization-and-dropout-in-neural-networks-explained-with-pytorch-47d7a8459bcd
 https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neural-networks-3ca24c31ddc8
 
+
+https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neural-networks-3ca24c31ddc8
+ L1, L2, Dropout or other techniques to combat overfitting.
+ 
 """
 import time
 import os
@@ -20,8 +24,8 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_traine_100.pth'
-
+fp = r'pizza_traine_300.pth'
+ilr = 0.008
 # dropout
 
 # TODO: Define transforms for the training data and testing data
@@ -47,7 +51,7 @@ train_data = torchvision.datasets.ImageFolder(data_dir + '/train', transform=tra
 test_data = torchvision.datasets.ImageFolder(data_dir + '/test', transform=test_transforms)
 val_data = torchvision.datasets.ImageFolder(data_dir + '/validation', transform=train_transforms)
 
-batchs = 32
+batchs = 48
 trainloader = torch.utils.data.DataLoader(train_data, batch_size=batchs, shuffle=True)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=batchs)
 valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=False)
@@ -125,6 +129,9 @@ def train(model, trainloader, device, optimizer, criterion,
     running_loss = 0
     steps = 0
     for epoch in range(epochs):
+        # decrease learning rate
+        lr = adjust_learning_rate(optimizer, epoch)
+
         for inputs, labels in trainloader:
             steps += 1
             # Move input and label tensors to the default device
@@ -154,12 +161,32 @@ def train(model, trainloader, device, optimizer, criterion,
                         equals = top_class == labels.view(*top_class.shape)
                         accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
                         
-                print(f"Epoch {epoch+1}/{epochs}.. " + str(steps)+
-                      f"Train loss: {running_loss/print_every:.3f}.. "
+                print(f"Epoch {epoch+1}/{epochs}.. " + str(steps)+ " lr: "+str(lr)+
+                      f" Train loss: {running_loss/print_every:.3f}.. "
                       f"Test loss: {test_loss/len(testloader):.3f}.. "
                       f"Test accuracy: {accuracy/len(testloader):.3f}")
                 running_loss = 0
+
                 model.train()
+                """
+                   losses = []
+                    for epoch in range(num_epochs):
+                        running_loss = 0.0
+                        for data in dataLoader:
+                            images, labels = data
+                            
+                            outputs = model(images)
+                            loss = criterion_label(outputs, labels)
+                            optimizer.zero_grad()
+                            loss.backward()
+                            optimizer.step()
+                
+                            running_loss += loss.item() * images.size(0) 
+                
+                        epoch_loss = running_loss / len(dataloaders['train'])
+                        losses.append(epoch_loss
+            plt.plot(loss_values)
+                """
 
 def imshow(inp, title=None):
     """Imshow for Tensor."""
@@ -271,11 +298,11 @@ class AverageMeter(object):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
 #https://github.com/pytorch/examples/blob/master/imagenet/main.py#L199
-def adjust_learning_rate(lr, epoch):
+def adjust_learning_rate(optimizer, epoch, every=30):
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    lr = lr * (0.1 ** (epoch // 30))
-    #for param_group in optimizer.param_groups:
-     #   param_group['lr'] = lr
+    lr = ilr * (0.1 ** (epoch // every))
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
     return lr
         
 class ProgressMeter(object):
@@ -367,10 +394,9 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
 
 def main():
-    epochs = 100
-    lr = 0.0045
-    print("lr:", lr, epochs )
-    model, device, optimizer, criterion = getModel(lr=lr)
+    epochs = 300
+    print("lr:", ilr, epochs )
+    model, device, optimizer, criterion = getModel(lr=ilr)
     inputs, classes = next(iter(trainloader))# Make a grid from batch
     sample_train_images = torchvision.utils.make_grid(inputs)
     #helper.imshow(sample_train_images, title=classes)
