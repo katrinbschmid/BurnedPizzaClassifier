@@ -19,8 +19,8 @@ from torch import nn,optim
 import torch.nn.functional as F
 import torchvision
 
-data_dir = r"D:\workspace\git_scr\BurnedPizzaClassifier\data\pizza"#'Cat_Dog_data'
-fp = r'C:\Users\kabis\.pytorch\pizza_train_100.pth'
+data_dir = r"../data/pizza"#'Cat_Dog_data'
+fp = r'pizza_train_100.pth'
 
 # dropout
 
@@ -234,7 +234,7 @@ def visualize_model(model, dataloader, device, num_images=6, startIndex=0):
                 ax = plt.subplot(num_images//2, 2, images_so_far)
                 ax.axis('off')
                 fn = os.path.basename(dataloader.dataset.samples[j][0])
-                print(fn, dataloader.dataset.samples[j][1] )
+                print(i,j, images_so_far, "images_so_far", fn, dataloader.dataset.samples[j][1] )
                 ax.set_title('predicted: {} ({})'.format(class_names[preds[j]],fn))
                 imshow(inputs.cpu().data[j])                
                 if images_so_far == num_images:
@@ -382,7 +382,7 @@ def main():
         torch.save(model.state_dict(), fp)
     test(None, model, device, valloader)
     #validate(valloader, model, criterion, device)
-    visualize_model(model, valloader, device, 1)#starts at 1
+    visualize_model(model, valloader, device, 1)
     plt.ioff()
     plt.show()
     return 0
