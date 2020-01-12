@@ -3,7 +3,7 @@
 #https://forums.fast.ai/t/using-pytorch-for-kaggle-dogs-vs-cats-competition-tutorial/30233
 based on classifies as burned as n
 https://discuss.pytorch.org/t/easiest-way-to-draw-training-validation-loss/13195/9
-
+https://towardsdatascience.com/batch-normalization-and-dropout-in-neural-networks-explained-with-pytorch-47d7a8459bcd
 https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neural-networks-3ca24c31ddc8
 
 """
@@ -20,23 +20,23 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_train_100.pth'
+fp = r'pizza_traine_100.pth'
 
 # dropout
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
-        torchvision.transforms.Resize(255),
-        torchvision.transforms.RandomRotation(40),
-        torchvision.transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),
+        torchvision.transforms.Resize(128),
+        torchvision.transforms.RandomRotation(25),
+        torchvision.transforms.RandomResizedCrop(224, scale=(0.84, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize([0.485, 0.456, 0.406],
                                                             [0.229, 0.224, 0.225])])
 
 test_transforms = torchvision.transforms.Compose([
-        torchvision.transforms.Resize(255),
+        #torchvision.transforms.Resize(255),
         torchvision.transforms.CenterCrop(224),
         torchvision. transforms.ToTensor(),
         torchvision.transforms.Normalize([0.485, 0.456, 0.406],
@@ -47,7 +47,7 @@ train_data = torchvision.datasets.ImageFolder(data_dir + '/train', transform=tra
 test_data = torchvision.datasets.ImageFolder(data_dir + '/test', transform=test_transforms)
 val_data = torchvision.datasets.ImageFolder(data_dir + '/validation', transform=train_transforms)
 
-batchs = 64
+batchs = 32
 trainloader = torch.utils.data.DataLoader(train_data, batch_size=batchs, shuffle=True)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=batchs)
 valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=False)
@@ -61,11 +61,12 @@ def getModel(lr=0.003):
         param.requires_grad = False
     
     classifier = nn.Sequential(OrderedDict([
-                              ('fc1', nn.Linear(1024, 500)),
+                              ('fc1', nn.Linear(1024, 500)), # 32 x 32= 1024 flatten the input image
                               ('relu', nn.ReLU()),
                               ('fc2', nn.Linear(500, 2)),
-                              ('output', nn.LogSoftmax(dim=1))
-                              ]))
+                              ('output', nn.LogSoftmax(dim=1),
+                             #  nn.BatchNorm2d(32)) #applying batch norm
+                             ) ]))
         
     model.classifier = classifier
 
@@ -364,10 +365,11 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
         shutil.copyfile(filename, 'model_best.pth.tar')
 
 
+
 def main():
     epochs = 100
-    lr = 0.0035
-    print("lr:", lr)
+    lr = 0.0045
+    print("lr:", lr, epochs )
     model, device, optimizer, criterion = getModel(lr=lr)
     inputs, classes = next(iter(trainloader))# Make a grid from batch
     sample_train_images = torchvision.utils.make_grid(inputs)
