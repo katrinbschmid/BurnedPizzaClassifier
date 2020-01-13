@@ -25,7 +25,7 @@ import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
 fp = r'pizza_traine_300.pth'
-ilr = 0.0065
+ilr = 0.007
 # dropout
 
 # TODO: Define transforms for the training data and testing data
@@ -130,7 +130,7 @@ def train(model, trainloader, device, optimizer, criterion,
     steps = 0
     for epoch in range(epochs):
         # decrease learning rate
-        lr = adjust_learning_rate(optimizer, epoch, every=12)
+        lr = adjust_learning_rate(optimizer, epoch, every=14)
 
         for inputs, labels in trainloader:
             steps += 1
@@ -304,7 +304,7 @@ def adjust_learning_rate(optimizer, epoch, every=30, minimum=0.0006):
     if lr < minimum:
         return minimum
     for param_group in optimizer.param_groups:
-        #param_group['lr'] = lr
+        param_group['lr'] = lr
         print(epoch, " is : ", param_group['lr'], lr, (0.1 * (epoch // every)))
     return lr
         
