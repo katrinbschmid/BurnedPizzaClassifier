@@ -130,7 +130,7 @@ def train(model, trainloader, device, optimizer, criterion,
     steps = 0
     for epoch in range(epochs):
         # decrease learning rate
-        lr = adjust_learning_rate(optimizer, epoch, every=14)
+        lr = adjust_learning_rate(optimizer, epoch, every=10)
 
         for inputs, labels in trainloader:
             steps += 1
@@ -297,6 +297,7 @@ class AverageMeter(object):
     def __str__(self):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
+
 #https://github.com/pytorch/examples/blob/master/imagenet/main.py#L199
 def adjust_learning_rate(optimizer, epoch, every=30, minimum=0.0006):
     """Sets the learning rate to the initial LR decayed by 10 % every 30 epochs"""
