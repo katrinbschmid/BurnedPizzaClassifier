@@ -9,8 +9,13 @@ https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neur
 
 https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neural-networks-3ca24c31ddc8
  L1, L2, Dropout or other techniques to combat overfitting.
+ https://medium.com/udacity-pytorch-challengers/trials-errors-and-trade-offs-in-my-deep-learning-model-d2e0c3d51794
  
+ https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
+ 
+https://necromuralist.github.io/In-Too-Deep/posts/nano/pytorch/part-8-transfer-learning/
 """
+
 import time
 import os
 from collections import OrderedDict
@@ -63,19 +68,21 @@ def getModel(lr=0.003):
     # Freeze parameters so we don't backprop through them
     for param in model.parameters():
         param.requires_grad = False
+        #param.requires_grad = True################
     
     classifier = nn.Sequential(OrderedDict([
                               ('fc1', nn.Linear(1024, 500)), # 32 x 32= 1024 flatten the input image
                               ('relu', nn.ReLU()),
                               ('fc2', nn.Linear(500, 2)),
                               ('output', nn.LogSoftmax(dim=1),
-                             #  nn.BatchNorm2d(32)) #applying batch norm
                              ) ]))
         
     model.classifier = classifier
 
     for device in ['cpu', 'cuda']:
-        criterion = nn.NLLLoss()
+        criterion = nn.NLLLoss()#L1 regularization
+        #criterion = torch.nn.MSELoss()#L2 regularization
+        #bn_1d = nn.BatchNorm1d(num_features)
         """
         torch.nn.NLLLoss(weight=None, size_average=None, ignore_index=-100, reduce=None, reduction='mean')
         The negative log likelihood loss. It is useful to train a classification problem with C classes
@@ -86,7 +93,6 @@ def getModel(lr=0.003):
         for ii, (inputs, labels) in enumerate(trainloader):
             # Move input and label tensors to the GPU
             inputs, labels = inputs.to(device), labels.to(device)
-    
             start = time.time()
             #labels tensor([1, 0, 2,
             #print(inputs, "p inputs, labels", labels)
@@ -108,7 +114,7 @@ def getModel(lr=0.003):
         
     model.classifier = nn.Sequential(nn.Linear(1024, 256),
                                      nn.ReLU(),
-                                     nn.Dropout(0.2),
+                                     nn.Dropout(0.5),####
                                      nn.Linear(256, 2),
                                      nn.LogSoftmax(dim=1))
     criterion = nn.NLLLoss()
