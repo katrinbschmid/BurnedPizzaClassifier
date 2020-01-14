@@ -30,7 +30,7 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_traine_300.pth'
+fp = r'pizza_traine_100.pth'
 ilr = 0.005
 # dropout
 
@@ -405,7 +405,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
 
 def main():
-    epochs = 300
+    epochs = 100
     print("lr:", ilr, epochs )
     model, device, optimizer, criterion = getModel(lr=ilr)
     inputs, classes = next(iter(trainloader))# Make a grid from batch
