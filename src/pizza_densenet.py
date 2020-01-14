@@ -30,13 +30,13 @@ import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
 fp = r'pizza_traine_300.pth'
-ilr = 0.007
+ilr = 0.006
 # dropout
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
-        torchvision.transforms.Resize(128),
+        torchvision.transforms.Resize(256),
         torchvision.transforms.RandomRotation(25),
         torchvision.transforms.RandomResizedCrop(224, scale=(0.84, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
