@@ -14,6 +14,7 @@ https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neur
  https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
  
 https://necromuralist.github.io/In-Too-Deep/posts/nano/pytorch/part-8-transfer-learning/
+https://github.com/udacity/deep-learning-v2-pytorch/blob/master/intro-to-pytorch/Part%205%20-%20Inference%20and%20Validation%20(Exercises).ipynb
 """
 
 import time
@@ -30,7 +31,7 @@ import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
 fp = r'pizza_traine_300.pth'
-ilr = 0.006
+ilr = 0.005
 # dropout
 
 # TODO: Define transforms for the training data and testing data
@@ -114,7 +115,7 @@ def getModel(lr=0.003):
         
     model.classifier = nn.Sequential(nn.Linear(1024, 256),
                                      nn.ReLU(),
-                                     nn.Dropout(0.5),####
+                                     nn.Dropout(0.6),####
                                      nn.Linear(256, 2),
                                      nn.LogSoftmax(dim=1))
     criterion = nn.NLLLoss()
