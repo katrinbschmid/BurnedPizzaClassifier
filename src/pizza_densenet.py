@@ -249,6 +249,32 @@ def test(args, model, device, test_loader):
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
 
+def visualize_model1(model, dataloader, device, num_images=6, startIndex=0):
+    was_training = model.training
+    model.eval()
+    images_so_far = 0
+    fig = plt.figure()
+    
+    with torch.no_grad():
+        for i, (inputs, labels) in enumerate(dataloader):
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+            
+            outputs = model(inputs)
+            _, preds = torch.max(outputs, 1)
+            
+            for j in range(inputs.size()[0]):
+                images_so_far += 1
+                ax = plt.subplot(num_images//2, 2, images_so_far)
+                ax.axis('off')
+                ax.set_title('predicted: {}'.format(class_names[preds[j]]))
+                imshow(inputs.cpu().data[j])
+                
+                if images_so_far == num_images:
+                    model.train(mode=was_training)
+                    return
+    model.train(mode=was_training)
+    
 def visualize_model(model, dataloader, device, num_images=6, startIndex=0):
     """
     visualize how our model is doing on validation set.
@@ -256,7 +282,7 @@ def visualize_model(model, dataloader, device, num_images=6, startIndex=0):
     """
     was_training = model.training
     model.eval()
-    images_so_far = 0
+    images_so_far = 2
     fig = plt.figure()   
     with torch.no_grad():
         for i, (inputs, labels) in enumerate(dataloader):
@@ -266,10 +292,12 @@ def visualize_model(model, dataloader, device, num_images=6, startIndex=0):
             _, preds = torch.max(outputs, 1)
             for j in range(inputs.size()[0]):
                 images_so_far += 1
+                print(i,j, images_so_far, num_images//2,"images_so_far", dataloader.dataset.samples[j][1] )
+                #2D grid
                 ax = plt.subplot(num_images//2, 2, images_so_far)
+                #ax = plt.subplot(2, 2)
                 ax.axis('off')
                 fn = os.path.basename(dataloader.dataset.samples[j][0])
-                print(i,j, images_so_far, "images_so_far", fn, dataloader.dataset.samples[j][1] )
                 ax.set_title('predicted: {} ({})'.format(class_names[preds[j]],fn))
                 imshow(inputs.cpu().data[j])                
                 if images_so_far == num_images:
@@ -421,7 +449,7 @@ def main():
         torch.save(model.state_dict(), fp)
     test(None, model, device, valloader)
     #validate(valloader, model, criterion, device)
-    visualize_model(model, valloader, device, 1)
+    visualize_model(model, valloader, device, 6, 1)
     plt.ioff()
     plt.show()
     return 0
