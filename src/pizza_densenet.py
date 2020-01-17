@@ -30,16 +30,16 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_traine_100.pth'
-ilr = 0.005
+fp = r'pizza_train0_006_100.pth' #77
+ilr = 0.006
 # dropout
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
         torchvision.transforms.Resize(256),
-        torchvision.transforms.RandomRotation(25),
-        torchvision.transforms.RandomResizedCrop(224, scale=(0.84, 1.0)),
+        torchvision.transforms.RandomRotation(45),
+        torchvision.transforms.RandomResizedCrop(224, scale=(0.74, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize([0.485, 0.456, 0.406],
@@ -115,7 +115,7 @@ def getModel(lr=0.003):
         
     model.classifier = nn.Sequential(nn.Linear(1024, 256),
                                      nn.ReLU(),
-                                     nn.Dropout(0.6),####
+                                     nn.Dropout(0.5),####
                                      nn.Linear(256, 2),
                                      nn.LogSoftmax(dim=1))
     criterion = nn.NLLLoss()
@@ -370,6 +370,7 @@ def validate(val_loader, model, criterion, device):
     model.eval()
     with torch.no_grad():
         end = time.time()
+        # batch
         for i, (images, target) in enumerate(val_loader):
             if args.gpu is not None:
                 images = images.cuda(args.gpu, non_blocking=True)
@@ -423,8 +424,8 @@ def main():
         torch.save(model.state_dict(), fp)
     test(None, model, device, valloader)
     #validate(valloader, model, criterion, device)
-    visualize_model(model, valloader, device, 6, 12, 0)
-    visualize_model(model, valloader, device, 6, 48, 0)
+    #visualize_model(model, valloader, device, 6, 12, 0)
+    visualize_model(model, valloader, device, 6, 47, 0)
 
     plt.ioff()
     plt.show()
