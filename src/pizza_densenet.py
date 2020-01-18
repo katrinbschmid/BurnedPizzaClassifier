@@ -30,7 +30,7 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_train0_0055_100.pth' #77
+fp = r'pizza_train0_0055_100_d06.pth' #77
 ilr = 0.0055
 # dropout
 
@@ -116,9 +116,10 @@ def getModel(lr=0.003):
         
     model.classifier = nn.Sequential(nn.Linear(1024, 256),
                                      nn.ReLU(),
-                                     nn.Dropout(0.5),####
+                                     nn.Dropout(0.6),####
                                      nn.Linear(256, 2),
-                                     nn.LogSoftmax(dim=1))
+                                     nn.LogSoftmax(dim=1)
+                                     )
     criterion = nn.NLLLoss()
     # Only train the classifier parameters, feature parameters are frozen
     optimizer = optim.Adam(model.classifier.parameters(), lr=lr)
