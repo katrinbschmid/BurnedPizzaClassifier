@@ -30,8 +30,8 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_train0_007_100.pth' #77
-ilr = 0.005
+fp = r'pizza_train0_0055_100.pth' #77
+ilr = 0.0055
 # dropout
 
 # TODO: Define transforms for the training data and testing data
