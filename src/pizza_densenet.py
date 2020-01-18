@@ -30,16 +30,16 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_train0_006_100.pth' #77
-ilr = 0.006
+fp = r'pizza_train0_007_100.pth' #77
+ilr = 0.005
 # dropout
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
         torchvision.transforms.Resize(256),
-        torchvision.transforms.RandomRotation(45),
-        torchvision.transforms.RandomResizedCrop(224, scale=(0.74, 1.0)),
+        torchvision.transforms.RandomRotation(25),
+        torchvision.transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize([0.485, 0.456, 0.406],
@@ -81,7 +81,8 @@ def getModel(lr=0.003):
     model.classifier = classifier
 
     for device in ['cpu', 'cuda']:
-        criterion = nn.NLLLoss()#L1 regularization
+        criterion = nn.CrossEntropyLoss()#loss = criterion(outputs, tensor_label)
+        #nn.L1Loss()#L1 regularization 
         #criterion = torch.nn.MSELoss()#L2 regularization
         #bn_1d = nn.BatchNorm1d(num_features)
         """
@@ -98,7 +99,7 @@ def getModel(lr=0.003):
             #labels tensor([1, 0, 2,
             #print(inputs, "p inputs, labels", labels)
             outputs = model.forward(inputs)
-            loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels)##########
             loss.backward()
             optimizer.step()
             if ii==3:
