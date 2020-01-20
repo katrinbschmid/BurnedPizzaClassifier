@@ -30,9 +30,10 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_train0_0055_100_d055.pth' #77
+fp = r'pizza_0055_100_d055.pth' #77
 ilr = 0.0055
-# dropout
+dropout = 0.55
+changeEvery = 16
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
@@ -116,7 +117,7 @@ def getModel(lr=0.003):
         
     model.classifier = nn.Sequential(nn.Linear(1024, 256),
                                      nn.ReLU(),
-                                     nn.Dropout(0.55),####
+                                     nn.Dropout(dropout),
                                      nn.Linear(256, 2),
                                      nn.LogSoftmax(dim=1)
                                      )
@@ -139,7 +140,7 @@ def train(model, trainloader, device, optimizer, criterion,
     steps = 0
     for epoch in range(epochs):
         # decrease learning rate
-        lr = adjust_learning_rate(optimizer, epoch, every=15)
+        lr = adjust_learning_rate(optimizer, epoch, every=changeEvery)
 
         for inputs, labels in trainloader:
             steps += 1
