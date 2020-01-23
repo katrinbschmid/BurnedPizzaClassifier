@@ -30,17 +30,17 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_0055_100_d055.pth' #77
+fp = r'pizza_0055_100_d055_18.pth' #77
 ilr = 0.0055
-dropout = 0.55
-changeEvery = 16
+dropout = 0.6
+changeEvery = 18
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
         torchvision.transforms.Resize(256),
         torchvision.transforms.RandomRotation(25),
-        torchvision.transforms.RandomResizedCrop(224, scale=(0.85, 1.0)),
+        torchvision.transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize([0.485, 0.456, 0.406],
