@@ -33,7 +33,7 @@ data_dir = r"../data/pizza"#'Cat_Dog_data'
 fp = r'pizzac_0055_100_d055_18.pth' #77
 ilr = 0.0055
 dropout = 0.55
-changeEvery = 14
+changeEvery = 12
 epochs = 50
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
