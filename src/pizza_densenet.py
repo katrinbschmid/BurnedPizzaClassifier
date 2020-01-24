@@ -30,11 +30,11 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizza_0055_100_d055_18.pth' #77
+fp = r'pizzac_0055_100_d055_18.pth' #77
 ilr = 0.0055
 dropout = 0.6
 changeEvery = 18
-
+epochs = 50
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
@@ -411,7 +411,6 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
 
 def main():
-    epochs = 100
     print("lr:", ilr, epochs )
     model, device, optimizer, criterion = getModel(lr=ilr)
     inputs, classes = next(iter(trainloader))# Make a grid from batch
