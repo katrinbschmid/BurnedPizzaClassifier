@@ -30,7 +30,7 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizzac_0055_100_d055_v.pth' #77
+fp = r'pizzac_0055_100_d055_v1.pth' #77
 ilr = 0.0055
 dropout = 0.55
 epochs = 100
