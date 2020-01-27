@@ -30,16 +30,16 @@ import torch.nn.functional as F
 import torchvision
 
 data_dir = r"../data/pizza"#'Cat_Dog_data'
-fp = r'pizzac_0055_100_d055_v1.pth' #77
+fp = r'pizzac_0055_100_d03.pth' #77
 ilr = 0.0055
-dropout = 0.55
-epochs = 100
+dropout = 0.3
+epochs = 50
 changeEvery = int(epochs/4.5)
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
-        torchvision.transforms.Resize(256),
+       # torchvision.transforms.Resize(256),
         torchvision.transforms.RandomRotation(25),
         torchvision.transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
@@ -81,19 +81,19 @@ def getModel(lr=0.003):
                              ) ]))
         
     model.classifier = classifier
-
+    criterion = nn.CrossEntropyLoss()
+    #nn.L1Loss()#L1 regularization 
+    #criterion = torch.nn.MSELoss()#L2 regularization
+    #bn_1d = nn.BatchNorm1d(num_features)
+    train_loss = 0
     for device in ['cpu', 'cuda']:
-        criterion = nn.CrossEntropyLoss()#loss = criterion(outputs, tensor_label)
-        #nn.L1Loss()#L1 regularization 
-        #criterion = torch.nn.MSELoss()#L2 regularization
-        #bn_1d = nn.BatchNorm1d(num_features)
         """
         torch.nn.NLLLoss(weight=None, size_average=None, ignore_index=-100, reduce=None, reduction='mean')
         The negative log likelihood loss. It is useful to train a classification problem with C classes
         """
         # Only train the classifier parameters, feature parameters are frozen
         optimizer = optim.Adam(model.classifier.parameters(), lr=0.001)
-        model.to(device)
+        res = model.to(device)
         for ii, (inputs, labels) in enumerate(trainloader):
             # Move input and label tensors to the GPU
             inputs, labels = inputs.to(device), labels.to(device)
@@ -101,11 +101,12 @@ def getModel(lr=0.003):
             #labels tensor([1, 0, 2,
             #print(inputs, "p inputs, labels", labels)
             outputs = model.forward(inputs)
-            loss = criterion(outputs, labels)##########
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             if ii==3:
                 break
+
         print(f"p Device = {device}; Time per batch: {(time.time() - start)/3:.3f} seconds")
 
     # Use GPU if it's available
@@ -134,15 +135,25 @@ def getModel(lr=0.003):
     model.to(device)
     return model, device, optimizer, criterion
 
+def viz_layer(layer, n_filters= 4):
+    fig = plt.figure(figsize=(20, 20))
+    
+    for i in range(n_filters):
+        ax = fig.add_subplot(1, n_filters, i+1, xticks=[], yticks=[])
+        # grab layer outputs
+        #print(i, layer[i][0].data.cpu())
+        ax.imshow(np.squeeze(layer[i][0].data.cpu().numpy()), cmap='gray')
+        ax.set_title('Output %s' % str(i+1))
+    plt.show()
 
 def train(model, trainloader, device, optimizer, criterion,
-          epochs=1, print_every=10):
+          epochs=1, print_every=10, show_layers=False):
     running_loss = 0
     steps = 0
     for epoch in range(epochs):
         # decrease learning rate
         lr = adjust_learning_rate(optimizer, epoch, every=changeEvery)
-
+        # for data, target in train_loader:
         for inputs, labels in trainloader:
             steps += 1
             # Move input and label tensors to the default device
@@ -154,7 +165,6 @@ def train(model, trainloader, device, optimizer, criterion,
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
-            
             if steps % print_every == 0:
                 test_loss = 0
                 accuracy = 0
@@ -162,6 +172,9 @@ def train(model, trainloader, device, optimizer, criterion,
                 with torch.no_grad():
                     for inputs, labels in testloader:
                         inputs, labels = inputs.to(device), labels.to(device)
+                        #layer = [module for module in model.modules() if type(module) != nn.Sequential]
+                        if show_layers:
+                            viz_layer(inputs, n_filters=8)
                         logps = model.forward(inputs)
                         batch_loss = criterion(logps, labels)
                         test_loss += batch_loss.item()
