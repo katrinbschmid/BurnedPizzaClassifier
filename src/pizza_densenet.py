@@ -1,20 +1,6 @@
 """
-"https://github.com/udacity/deep-learning-v2-pytorch/blob/master/intro-to-pytorch/Part%208%20-%20Transfer%20Learning%20(Solution).ipynb
-#https://forums.fast.ai/t/using-pytorch-for-kaggle-dogs-vs-cats-competition-tutorial/30233
-based on classifies as burned as n
-https://discuss.pytorch.org/t/easiest-way-to-draw-training-validation-loss/13195/9
-https://towardsdatascience.com/batch-normalization-and-dropout-in-neural-networks-explained-with-pytorch-47d7a8459bcd
-https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neural-networks-3ca24c31ddc8
-
-
-https://towardsdatascience.com/a-bunch-of-tips-and-tricks-for-training-deep-neural-networks-3ca24c31ddc8
- L1, L2, Dropout or other techniques to combat overfitting.
- https://medium.com/udacity-pytorch-challengers/trials-errors-and-trade-offs-in-my-deep-learning-model-d2e0c3d51794
- 
- https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html
- 
-https://necromuralist.github.io/In-Too-Deep/posts/nano/pytorch/part-8-transfer-learning/
-https://github.com/udacity/deep-learning-v2-pytorch/blob/master/intro-to-pytorch/Part%205%20-%20Inference%20and%20Validation%20(Exercises).ipynb
+Based on 
+https://github.com/udacity/deep-learning-v2-pytorch/blob/master/intro-to-pytorch/Part%208%20-%20Transfer%20Learning%20(Solution).ipynb
 """
 
 import time
@@ -29,19 +15,20 @@ from torch import nn,optim
 import torch.nn.functional as F
 import torchvision
 
-data_dir = r"../data/pizza"#'Cat_Dog_data'
+#some global parameters
+data_dir = r"../data/pizza"
 fp = r'pizzac_0055_100_d03.pth' #77
 ilr = 0.0055
-dropout = 0.3
+dropout = 0.55
 epochs = 50
 changeEvery = int(epochs/4.5)
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
 train_transforms = torchvision.transforms.Compose([
-       # torchvision.transforms.Resize(256),
+        torchvision.transforms.Resize(256),
         torchvision.transforms.RandomRotation(25),
-        torchvision.transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),
+        torchvision.transforms.RandomResizedCrop(224, scale=(0.95, 1.0)),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.ToTensor(),
         torchvision.transforms.Normalize([0.485, 0.456, 0.406],
@@ -66,6 +53,14 @@ valloader = torch.utils.data.DataLoader(val_data, batch_size=batchs, shuffle=Fal
 class_names = train_data.classes
 
 def getModel(lr=0.003):
+    """
+    Args:
+        param1 (int): The first parameter.
+        param2 (str): The second parameter.
+
+    Returns:
+        bool: The return value. True for success, False otherwise.
+    """
     model = torchvision.models.densenet121(pretrained=True)
     #We can load in a model such as DenseNet. Let's print out the model architecture so we can see what's going on.
     # Freeze parameters so we don't backprop through them
@@ -145,6 +140,7 @@ def viz_layer(layer, n_filters= 4):
         ax.imshow(np.squeeze(layer[i][0].data.cpu().numpy()), cmap='gray')
         ax.set_title('Output %s' % str(i+1))
     plt.show()
+    return
 
 def train(model, trainloader, device, optimizer, criterion,
           epochs=1, print_every=10, show_layers=False):
@@ -211,6 +207,7 @@ def train(model, trainloader, device, optimizer, criterion,
                         losses.append(epoch_loss
             plt.plot(loss_values)
                 """
+    return
 
 def imshow(inp, title=None):
     """Imshow for Tensor."""
@@ -223,28 +220,8 @@ def imshow(inp, title=None):
     if title is not None:
         plt.title(title)
     plt.pause(0.001)  # pause a bit so that plots are updated# Get a batch of training data
+    return
 
-"""
-   def forward(self, input):  # noqa: F811
-        if isinstance(input, Tensor):
-            prev_features = [input]
-        else:
-            prev_features = input
-
-        if self.memory_efficient and self.any_requires_grad(prev_features):
-            if torch.jit.is_scripting():
-                raise Exception("Memory Efficient not supported in JIT")
-
-            bottleneck_output = self.call_checkpoint_bottleneck(prev_features)
-        else:
-            bottleneck_output = self.bn_function(prev_features)
-
-        new_features = self.conv2(self.relu2(self.norm2(bottleneck_output)))
-        if self.drop_rate > 0:
-            new_features = F.dropout(new_features, p=self.drop_rate,
-                                     training=self.training)
-        return new_features
-"""
 
 #https://raw.githubusercontent.com/pytorch/examples/master/mnist/main.py
 def test(args, model, device, test_loader):
@@ -265,7 +242,7 @@ def test(args, model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
-
+    return
     
 def visualize_model(model, dataloader, device, num_images=6, startIndex=0, batch=0):
     """
@@ -352,7 +329,8 @@ class ProgressMeter(object):
         return '[' + fmt + '/' + fmt.format(num_batches) + ']'
 
 def accuracy(output, target, topk=(1,)):
-    """Computes the accuracy over the k top predictions for the specified values of k"""
+    """Computes the accuracy over the k top predictions for the specified values of k
+    """
     with torch.no_grad():
         maxk = max(topk)
         batch_size = target.size(0)
@@ -368,10 +346,15 @@ def accuracy(output, target, topk=(1,)):
         return res
 
 
-class Object(object):
-    pass
-
 def validate(val_loader, model, criterion, device):
+    """
+    Args:
+        param1 (int): The first parameter.
+        param2 (str): The second parameter.
+
+    Returns:
+        bool: The return value. True for success, False otherwise.
+    """
     args = Object
     args.gpu = device
     batch_time = AverageMeter('Time', ':6.3f')
@@ -413,26 +396,32 @@ def validate(val_loader, model, criterion, device):
         # TODO: this should also be done with the ProgressMeter
         print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
               .format(top1=top1, top5=top5))
-
     return top1.avg
 
 
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+    """
+    Args:
+        param1 (int): The first parameter.
+        param2 (str): The second parameter.
+
+    Returns:
+        bool: The return value. True for success, False otherwise.
+    """
     torch.save(state, filename)
     if is_best:
         shutil.copyfile(filename, 'model_best.pth.tar')
-
+    return
 
 
 def main():
-    print("lr:", ilr, epochs )
     model, device, optimizer, criterion = getModel(lr=ilr)
     inputs, classes = next(iter(trainloader))# Make a grid from batch
     sample_train_images = torchvision.utils.make_grid(inputs)
     #helper.imshow(sample_train_images, title=classes)
     if os.path.isfile(fp):
         state_dict = torch.load(fp)
-        print(state_dict.keys())
+        #print(state_dict.keys())
         model.load_state_dict(state_dict)
     else:
         train(model, trainloader, device, optimizer, criterion,
@@ -450,3 +439,4 @@ def main():
 print(class_names)
 main()
 print("done")
+
