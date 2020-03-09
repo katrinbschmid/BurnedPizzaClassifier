@@ -16,12 +16,12 @@ import torch.nn.functional as F
 import torchvision
 
 #some global parameters
-data_dir = r"../data/pizza"
-fp = r'pizzac_0055_100_d03.pth' #77
+g_data_dir = r"../data/pizza"
+g_fp = r'pizzac_0055_100_d03.pth'
 ilr = 0.0055
-dropout = 0.55
-epochs = 50
-changeEvery = int(epochs/4.5)
+g_dropout = 0.55
+g_epochs = 50
+g_changeEvery = int(g_epochs/4.5)
 
 # TODO: Define transforms for the training data and testing data
 #https://pytorch.org/docs/stable/torchvision/transforms.html
@@ -42,9 +42,9 @@ test_transforms = torchvision.transforms.Compose([
                                                            [0.229, 0.224, 0.225])])
 
 # Pass transforms in here, then run the next cell to see how the transforms look
-train_data = torchvision.datasets.ImageFolder(data_dir + '/train', transform=train_transforms)
-test_data = torchvision.datasets.ImageFolder(data_dir + '/test', transform=test_transforms)
-val_data = torchvision.datasets.ImageFolder(data_dir + '/validation', transform=train_transforms)
+train_data = torchvision.datasets.ImageFolder(g_data_dir + '/train', transform=train_transforms)
+test_data = torchvision.datasets.ImageFolder(g_data_dir + '/test', transform=test_transforms)
+val_data = torchvision.datasets.ImageFolder(g_data_dir + '/validation', transform=train_transforms)
 
 batchs = 48
 trainloader = torch.utils.data.DataLoader(train_data, batch_size=batchs, shuffle=True)
@@ -114,7 +114,7 @@ def getModel(lr=0.003):
         
     model.classifier = nn.Sequential(nn.Linear(1024, 256),
                                      nn.ReLU(),
-                                     nn.Dropout(dropout),
+                                     nn.Dropout(g_dropout),
                                      nn.Linear(256, 2),
                                      nn.LogSoftmax(dim=1)
                                      )
@@ -143,10 +143,10 @@ def viz_layer(layer, n_filters= 4):
     return
 
 def train(model, trainloader, device, optimizer, criterion,
-          epochs=1, print_every=10, show_layers=False):
+          g_epochs=1, print_every=10, show_layers=False, changeEvery=g_changeEvery):
     running_loss = 0
     steps = 0
-    for epoch in range(epochs):
+    for epoch in range(g_epochs):
         # decrease learning rate
         lr = adjust_learning_rate(optimizer, epoch, every=changeEvery)
         # for data, target in train_loader:
@@ -181,7 +181,7 @@ def train(model, trainloader, device, optimizer, criterion,
                         equals = top_class == labels.view(*top_class.shape)
                         accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
                         
-                print(f"Epoch {epoch+1}/{epochs}.. " + str(steps)+ " lr: "+str(lr)+
+                print(f"Epoch {epoch+1}/{g_epochs}.. " + str(steps)+ " lr: "+str(lr)+
                       f" Train loss: {running_loss/print_every:.3f}.. "
                       f"Test loss: {test_loss/len(testloader):.3f}.. "
                       f"Test accuracy: {accuracy/len(testloader):.3f}")
@@ -303,7 +303,7 @@ class AverageMeter(object):
 
 #https://github.com/pytorch/examples/blob/master/imagenet/main.py#L199
 def adjust_learning_rate(optimizer, epoch, every=30, minimum=0.0006):
-    """Sets the learning rate to the initial LR decayed by 10 % every 30 epochs"""
+    """Sets the learning rate to the initial LR decayed by 10 % every 30 g_epochs"""
     lr = ilr  - ilr * (0.1 * (epoch // every))
     if lr < minimum:
         return minimum
@@ -419,14 +419,14 @@ def main():
     inputs, classes = next(iter(trainloader))# Make a grid from batch
     sample_train_images = torchvision.utils.make_grid(inputs)
     #helper.imshow(sample_train_images, title=classes)
-    if os.path.isfile(fp):
-        state_dict = torch.load(fp)
+    if os.path.isfile(g_fp):
+        state_dict = torch.load(g_fp)
         #print(state_dict.keys())
         model.load_state_dict(state_dict)
     else:
         train(model, trainloader, device, optimizer, criterion,
-               epochs=epochs, print_every=8)
-        torch.save(model.state_dict(), fp)
+               g_epochs=g_epochs, print_every=8)
+        torch.save(model.state_dict(), g_fp)
     test(None, model, device, valloader)
     #validate(valloader, model, criterion, device)
     #visualize_model(model, valloader, device, 6, 12, 0)
