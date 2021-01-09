@@ -6,4 +6,4 @@ TODO need more pictures (most of them are form restaurant reviews).
 All images stored in data folder.
 
 
-![Alt text](result.png?raw=true "result")
+![Alt text](pizza.jpg?raw=true "result")
